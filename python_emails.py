@@ -1,8 +1,11 @@
+import email, smtplib, ssl
+
+from email import encoders
+from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from getpass import getpass
 
-import smtplib, ssl
 
 smtp_server = 'smtp.gmail.com'
 port = 465
@@ -37,8 +40,22 @@ html = """\
 part1 = MIMEText(text, 'plain')
 part2 = MIMEText(html, 'html')
 
+filename = 'python.jpg'
+
+with open(filename, 'rb') as attachment:
+    part_a = MIMEBase('application', 'octet-stream')
+    part_a.set_payload(attachment.read())
+
+encoders.encode_base64(part_a)
+
+part_a.add_header(
+    'Content-Disposition',
+    f'attachment; filename={filename}'
+)
+
 message.attach(part1)
 message.attach(part2) #last attach goes first
+message.attach(part_a)
 
 context = ssl.create_default_context()
 
