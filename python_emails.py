@@ -2,14 +2,22 @@ from getpass import getpass
 import smtplib, ssl
 
 smtp_server = 'smtp.gmail.com'
-port = 465
+port = 587
 
 sender = 'edward.p.kolodziejski@gmail.com'
 password = getpass('Enter your password: ')
 
 context = ssl.create_default_context()
 
-
-with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+try:
+    server = smtplib.SMTP(smtp_server, port)
+    server.ehlo() #extended hello version
+    server.starttls(context=context)
+    server.ehlo()
     server.login(sender, password)
-    print('It worked!')
+    #send email
+    print('It worked')
+except Exception as e:
+    print(e)
+finally:
+    server.quit()
